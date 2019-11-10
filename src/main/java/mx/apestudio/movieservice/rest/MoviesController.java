@@ -1,5 +1,9 @@
 package mx.apestudio.movieservice.rest;
 
+import com.jayway.jsonpath.Criteria;
+import com.jayway.jsonpath.Filter;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Predicate;
 import mx.apestudio.movieservice.dto.OmdbResponse;
 import mx.apestudio.movieservice.dto.TasteDiveResponse;
 import mx.apestudio.movieservice.model.MovieResponse;
@@ -10,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -41,10 +48,13 @@ public class MoviesController {
         log.debug("tmdb url: {}", tmdbRestTemplate.getUriTemplateHandler().expand("/search/movie?query={title}", title));
         String tmdbResponse = tmdbRestTemplate.getForObject("/search/movie?query={title}", String.class, title);
         log.debug("tmdbResponse: {}", tmdbResponse);
+        List<Double> vote_average = JsonPath.read(tmdbResponse,"$.results[?].vote_average", Filter.filter(Criteria.where("title").eq(title)));
+        log.debug("vote_average: {}", vote_average);
         return new MovieResponse()
                 .title(omdbResponse.getTitle())
                 .year(omdbResponse.getYear())
                 .plot(omdbResponse.getPlot())
-                .youtubeUrl(tasteDiveResponse.getSimilar().getInfo().get(0).getYoutubeUrl());
+                .youtubeUrl(tasteDiveResponse.getSimilar().getInfo().get(0).getYoutubeUrl())
+                .voteAverage(Optional.of(vote_average.get(0)).orElse(0D).floatValue());
     }
 }
