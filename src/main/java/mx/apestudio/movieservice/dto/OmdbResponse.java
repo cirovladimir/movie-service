@@ -1,10 +1,10 @@
-package mx.apestudio.movieservice.model;
+package mx.apestudio.movieservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
-public class Movie {
+public class OmdbResponse {
     @JsonProperty("Title")
     String title;
     @JsonProperty("Year")
@@ -13,8 +13,10 @@ public class Movie {
     String runtime;
     @JsonProperty("Genre")
     String genre;
+    @JsonProperty("Plot")
+    String plot;
 
-    public Movie() {
+    public OmdbResponse() {
     }
 
     public String getTitle() {
@@ -49,13 +51,21 @@ public class Movie {
         this.genre = genre;
     }
 
+    public String getPlot() {
+        return plot;
+    }
+
+    public void setPlot(String plot) {
+        this.plot = plot;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Movie movie = (Movie) o;
-        return Objects.equals(title, movie.title) &&
-                Objects.equals(year, movie.year);
+        OmdbResponse omdbResponse = (OmdbResponse) o;
+        return Objects.equals(title, omdbResponse.title) &&
+                Objects.equals(year, omdbResponse.year);
     }
 
     @Override
@@ -65,11 +75,12 @@ public class Movie {
 
     @Override
     public String toString() {
-        return "Movie{" +
+        return "OmdbResponse{" +
                 "title='" + title + '\'' +
                 ", year=" + year +
                 ", runtime='" + runtime + '\'' +
                 ", genre='" + genre + '\'' +
+                ", plot='" + plot + '\'' +
                 '}';
     }
 }

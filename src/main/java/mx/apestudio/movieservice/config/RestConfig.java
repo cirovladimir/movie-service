@@ -13,12 +13,20 @@ public class RestConfig {
     @Value("${omdb.api.url:http://www.omdbapi.com/?apikey=8ab01b20&}")
     String omdbApiUrl;
 
-    @Value("${tastedive.api.url:https://tastedive.com/api?type=movie}")
+    @Value("${tastedive.api.url:https://tastedive.com/api?type=movie&info=1}")
     String tasteDiveUrl;
+
+    @Value("${tmdb.api.url:https://api.themoviedb.org/3?api_key=617850a2cf7ef6cccbecc02ff6df21ba}")
+    String tmdbUrl;
 
     @Bean
     public RestTemplate omdbRestTemplate(RestTemplateBuilder builder){
         return builder.uriTemplateHandler(new DefaultUriBuilderFactory(omdbApiUrl)).build();
+    }
+
+    @Bean
+    public RestTemplate tmdbRestTemplate(RestTemplateBuilder builder){
+        return builder.uriTemplateHandler(new DefaultUriBuilderFactory(tmdbUrl)).build();
     }
 
     @Bean
