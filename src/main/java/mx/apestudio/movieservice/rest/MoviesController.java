@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/api")
@@ -48,13 +49,18 @@ public class MoviesController {
         log.debug("tmdb url: {}", tmdbRestTemplate.getUriTemplateHandler().expand("/search/movie?query={title}", title));
         String tmdbResponse = tmdbRestTemplate.getForObject("/search/movie?query={title}", String.class, title);
         log.debug("tmdbResponse: {}", tmdbResponse);
-        List<Double> vote_average = JsonPath.read(tmdbResponse,"$.results[?].vote_average", Filter.filter(Criteria.where("title").eq(title)));
+        List<Double> vote_average = JsonPath.read(tmdbResponse,"$.results[?].vote_average", Filter.filter(Criteria.where("title").regex(Pattern.compile(title, Pattern.CASE_INSENSITIVE))));
         log.debug("vote_average: {}", vote_average);
+        String yurl = Optional.ofNullable(tasteDiveResponse.getSimilar())
+                .map(similar -> similar.getInfo())
+                .map(info -> info.get(0))
+                .map(info -> info.getYoutubeUrl())
+                .orElse("default youtube url");
         return new MovieResponse()
                 .title(omdbResponse.getTitle())
                 .year(omdbResponse.getYear())
                 .plot(omdbResponse.getPlot())
-                .youtubeUrl(tasteDiveResponse.getSimilar().getInfo().get(0).getYoutubeUrl())
-                .voteAverage(Optional.of(vote_average.get(0)).orElse(0D).floatValue());
+                .youtubeUrl(yurl)
+                .voteAverage(vote_average.size()>0? vote_average.get(0).floatValue() : null);
     }
 }
